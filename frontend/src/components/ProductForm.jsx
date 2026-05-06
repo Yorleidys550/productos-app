@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API = "http://localhost:3000/api/products";
+const API = "https://productos-app-backend.onrender.com/api/products";
 
 function ProductForm({ onSave, editProduct, setEditProduct }) {
   const [form, setForm] = useState({ name: "", description: "", price: "" });
