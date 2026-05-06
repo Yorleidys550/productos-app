@@ -1,19 +1,14 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-
-const API = "https://productos-app-backend.onrender.com/api/products";
-
+const API = "http://localhost:3000/api/products";
 function ProductForm({ onSave, editProduct, setEditProduct }) {
   const [form, setForm] = useState({ name: "", description: "", price: "" });
-
   useEffect(() => {
     if (editProduct) setForm(editProduct);
   }, [editProduct]);
-
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (editProduct) {
@@ -24,7 +19,6 @@ function ProductForm({ onSave, editProduct, setEditProduct }) {
     setForm({ name: "", description: "", price: "" });
     onSave();
   };
-
   return (
     <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
       <h2>{editProduct ? "✏️ Editar Producto" : "➕ Nuevo Producto"}</h2>
@@ -63,5 +57,4 @@ function ProductForm({ onSave, editProduct, setEditProduct }) {
     </form>
   );
 }
-
 export default ProductForm;

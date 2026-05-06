@@ -1,67 +1,49 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-
-const API = "https://productos-app-backend.onrender.com/api/products";
-
-function ProductForm({ onSave, editProduct, setEditProduct }) {
-  const [form, setForm] = useState({ name: "", description: "", price: "" });
-
+const API = "http://localhost:3000/api/products";
+function ProductList({ refresh, onEdit, onDelete }) {
+  const [products, setProducts] = useState([]);
   useEffect(() => {
-    if (editProduct) setForm(editProduct);
-  }, [editProduct]);
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (editProduct) {
-      await axios.put(`${API}/${editProduct.id}`, form);
-    } else {
-      await axios.post(API, form);
+    axios.get(API).then((res) => setProducts(res.data));
+  }, [refresh]);
+  const handleDelete = async (id) => {
+    if (confirm("¿Seguro que deseas eliminar este producto?")) {
+      await axios.delete(`${API}/${id}`);
+      onDelete();
     }
-    setForm({ name: "", description: "", price: "" });
-    onSave();
   };
-
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-      <h2>{editProduct ? "✏️ Editar Producto" : "➕ Nuevo Producto"}</h2>
-      <input
-        name="name"
-        placeholder="Nombre"
-        value={form.name}
-        onChange={handleChange}
-        required
-        style={{ display: "block", marginBottom: "8px", width: "100%", padding: "8px" }}
-      />
-      <input
-        name="description"
-        placeholder="Descripción"
-        value={form.description}
-        onChange={handleChange}
-        style={{ display: "block", marginBottom: "8px", width: "100%", padding: "8px" }}
-      />
-      <input
-        name="price"
-        placeholder="Precio"
-        type="number"
-        value={form.price}
-        onChange={handleChange}
-        required
-        style={{ display: "block", marginBottom: "8px", width: "100%", padding: "8px" }}
-      />
-      <button type="submit" style={{ marginRight: "8px", padding: "8px 16px" }}>
-        {editProduct ? "Actualizar" : "Guardar"}
-      </button>
-      {editProduct && (
-        <button type="button" onClick={() => setEditProduct(null)} style={{ padding: "8px 16px" }}>
-          Cancelar
-        </button>
-      )}
-    </form>
+    <div>
+      <h2>📦 Lista de Productos</h2>
+      {products.length === 0 && <p>No hay productos aún.</p>}
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr style={{ background: "#f0f0f0" }}>
+            <th style={th}>ID</th>
+            <th style={th}>Nombre</th>
+            <th style={th}>Descripción</th>
+            <th style={th}>Precio</th>
+            <th style={th}>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((p) => (
+            <tr key={p.id}>
+              <td style={td}>{p.id}</td>
+              <td style={td}>{p.name}</td>
+              <td style={td}>{p.description}</td>
+              <td style={td}>${p.price}</td>
+              <td style={td}>
+                <button onClick={() => onEdit(p)} style={{ marginRight: "8px" }}>✏️</button>
+                <button onClick={() => handleDelete(p.id)}>🗑️</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
-
-export default ProductForm;
+const th = { padding: "10px", border: "1px solid #ddd", textAlign: "left" };
+const td = { padding: "10px", border: "1px solid #ddd" };
+export default ProductList;
